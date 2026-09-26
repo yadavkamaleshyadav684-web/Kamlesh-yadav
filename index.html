@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KiranaKart – Online Kirana Ordering</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f5f7fb;color:#172033}
+button,input,select{font:inherit}button{cursor:pointer;border:0}.top{background:#16834b;color:#fff;padding:14px 18px;position:sticky;top:0;z-index:5}
+.topin{max-width:1100px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:10px}.brand{font-size:22px;font-weight:800}.tabs{display:flex;gap:8px}.tabs button{padding:9px 13px;border-radius:8px;background:#fff;color:#16834b;font-weight:700}
+.wrap{max-width:1100px;margin:22px auto;padding:0 15px}.hero{background:linear-gradient(135deg,#16834b,#28a866);color:#fff;padding:28px;border-radius:18px;margin-bottom:18px}.hero h1{margin:0 0 8px;font-size:30px}.muted{color:#687386}.hero .muted{color:#e8fff2}
+.card{background:#fff;border-radius:15px;padding:18px;box-shadow:0 3px 15px #0000000b;margin-bottom:16px}.row{display:flex;gap:10px;flex-wrap:wrap}.search{width:100%;padding:13px;border:1px solid #dbe1ea;border-radius:10px;margin-bottom:15px}
+.cats{display:flex;gap:8px;overflow:auto;padding-bottom:8px}.cat{background:#eef7f1;color:#16834b;padding:9px 13px;border-radius:20px;white-space:nowrap}.cat.active{background:#16834b;color:#fff}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}.product{border:1px solid #e5e9ef;border-radius:13px;padding:13px}.pic{height:125px;background:#f0f2f5;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:48px;margin-bottom:10px}.product h3{margin:5px 0}.price{font-size:19px;font-weight:800}.product small{color:#7a8493}.add{background:#16834b;color:white;padding:9px 13px;border-radius:8px;margin-top:9px;width:100%}
+.admin h2,.card h2{margin-top:0}.formgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.field{display:flex;flex-direction:column;gap:5px}.field input,.field select{padding:11px;border:1px solid #d8dee8;border-radius:9px}.wide{grid-column:1/-1}.primary{background:#16834b;color:#fff;padding:11px 15px;border-radius:9px}.danger{background:#ffe9e9;color:#c62828;padding:8px 11px;border-radius:8px}.table{width:100%;border-collapse:collapse}.table th,.table td{padding:10px;border-bottom:1px solid #eee;text-align:left;font-size:14px}.badge{padding:5px 8px;border-radius:15px;background:#fff3cd;color:#806000;font-size:12px}.cartbar{position:fixed;bottom:16px;right:16px;background:#172033;color:#fff;padding:13px 17px;border-radius:30px;box-shadow:0 5px 20px #0004}.modal{position:fixed;inset:0;background:#0008;display:none;align-items:center;justify-content:center;padding:15px;z-index:10}.modal.show{display:flex}.modalbox{background:#fff;max-width:520px;width:100%;border-radius:16px;padding:20px;max-height:90vh;overflow:auto}.notice{padding:11px;border-radius:9px;background:#eef7f1;color:#12653a;margin-bottom:10px}
+@media(max-width:650px){.formgrid{grid-template-columns:1fr}.hero h1{font-size:24px}.grid{grid-template-columns:repeat(2,1fr)}.product{padding:9px}.pic{height:100px}.topin{align-items:flex-start;flex-direction:column}.tabs{width:100%}.tabs button{flex:1}}
+</style>
+</head>
+<body>
+<header class="top"><div class="topin"><div class="brand">🛒 KiranaKart</div><div class="tabs"><button onclick="show('customer')">Customer</button><button onclick="show('admin')">Owner Panel</button></div></div></header>
+
+<main class="wrap">
+<section id="customer">
+<div class="hero"><h1 id="shopTitle">Sharma Kirana Store</h1><div id="shopInfo">Daily grocery • Home delivery</div><div class="muted" id="shopAddress">Mumbai, Maharashtra</div></div>
+<div class="card">
+<input id="search" class="search" placeholder="🔎 Product search..." oninput="renderProducts()">
+<div class="cats" id="cats"></div>
+</div>
+<div class="card"><h2>Products</h2><div class="grid" id="products"></div></div>
+</section>
+
+<section id="admin" style="display:none" class="admin">
+<div class="card"><h2>⚙️ Kirana Owner Admin Panel</h2><div class="notice">Demo prototype: changes are saved in this browser automatically.</div>
+<div class="formgrid">
+<div class="field"><label>Shop Name</label><input id="aName"></div>
+<div class="field"><label>Mobile</label><input id="aMobile"></div>
+<div class="field wide"><label>Address</label><input id="aAddress"></div>
+<div class="field"><label>UPI ID</label><input id="aUpi"></div>
+<div class="field"><label>Delivery Charge (₹)</label><input id="aDelivery" type="number"></div>
+</div><br><button class="primary" onclick="saveShop()">Save Shop Details</button></div>
+
+<div class="card"><h2>➕ Add Product</h2><div class="formgrid">
+<div class="field"><label>Product Name</label><input id="pName" placeholder="e.g. Tata Salt 1kg"></div>
+<div class="field"><label>Category</label><select id="pCat"><option>Atta & Rice</option><option>Dal</option><option>Oil</option><option>Snacks</option><option>Cold Drinks</option><option>Milk & Dairy</option><option>Household</option><option>Other</option></select></div>
+<div class="field"><label>Price (₹)</label><input id="pPrice" type="number" placeholder="50"></div>
+<div class="field"><label>Emoji/Image</label><input id="pEmoji" placeholder="🧂"></div>
+</div><br><button class="primary" onclick="addProduct()">Add Product</button></div>
+
+<div class="card"><h2>📦 Manage Products</h2><div id="manageProducts"></div></div>
+<div class="card"><h2>🧾 Orders</h2><div id="orders"></div></div>
+</section>
+</main>
+
+<div class="cartbar" onclick="openCart()">🛒 Cart: <b id="cartCount">0</b> • ₹<b id="cartTotal">0</b></div>
+
+<div class="modal" id="cartModal"><div class="modalbox"><h2>🛒 Your Cart</h2><div id="cartItems"></div><hr>
+<div><b>Total: ₹<span id="checkoutTotal">0</span></b></div><br>
+<div class="formgrid"><div class="field"><label>Name</label><input id="cName" placeholder="Your name"></div><div class="field"><label>Mobile</label><input id="cMobile" placeholder="10-digit mobile"></div><div class="field wide"><label>Delivery Address</label><input id="cAddress" placeholder="Full address"></div><div class="field"><label>Payment</label><select id="cPayment"><option>Cash on Delivery</option><option>UPI</option></select></div></div><br>
+<button class="primary" onclick="placeOrder()">Place Order</button> <button onclick="closeCart()" style="padding:11px">Close</button><p id="orderMsg"></p></div></div>
+
+<script>
+const $=id=>document.getElementById(id);
+const demoProducts=[
+{id:1,name:"Aashirvaad Atta 5kg",cat:"Atta & Rice",price:285,emoji:"🌾"},
+{id:2,name:"India Gate Rice 5kg",cat:"Atta & Rice",price:420,emoji:"🍚"},
+{id:3,name:"Toor Dal 1kg",cat:"Dal",price:145,emoji:"🫘"},
+{id:4,name:"Fortune Sunflower Oil 1L",cat:"Oil",price:145,emoji:"🫗"},
+{id:5,name:"Tata Salt 1kg",cat:"Other",price:28,emoji:"🧂"},
+{id:6,name:"Parle-G Biscuits",cat:"Snacks",price:20,emoji:"🍪"},
+{id:7,name:"Coca-Cola 750ml",cat:"Cold Drinks",price:45,emoji:"🥤"},
+{id:8,name:"Amul Milk 1L",cat:"Milk & Dairy",price:68,emoji:"🥛"}
+];
+let data=JSON.parse(localStorage.getItem("kk_data")||"null")||{shop:{name:"Sharma Kirana Store",mobile:"9876543210",address:"Mumbai, Maharashtra",upi:"sharmakirana@upi",delivery:30},products:demoProducts,orders:[]};
+let cart=[],activeCat="All";
+
+function save(){localStorage.setItem("kk_data",JSON.stringify(data))}
+function show(id){document.getElementById("customer").style.display=id==="customer"?"block":"none";document.getElementById("admin").style.display=id==="admin"?"block":"none";if(id==="admin")renderAdmin()}
+function init(){
+$('shopTitle').textContent=data.shop.name;$('shopInfo').textContent="📞 "+data.shop.mobile+" • Home delivery";$('shopAddress').textContent=data.shop.address;
+$('aName').value=data.shop.name;$('aMobile').value=data.shop.mobile;$('aAddress').value=data.shop.address;$('aUpi').value=data.shop.upi;$('aDelivery').value=data.shop.delivery;
+renderCats();renderProducts();renderAdmin();
+}
+function renderCats(){let cats=["All",...new Set(data.products.map(p=>p.cat))];document.getElementById("cats").innerHTML=cats.map(c=>`<button class="cat ${activeCat===c?"active":""}" onclick="activeCat='${c}';renderCats();renderProducts()">${c}</button>`).join("")}
+function renderProducts(){let q=$('search').value.toLowerCase();let ps=data.products.filter(p=>(activeCat==="All"||p.cat===activeCat)&&p.name.toLowerCase().includes(q));$('products').innerHTML=ps.map(p=>`<div class="product"><div class="pic">${p.emoji||"🛒"}</div><small>${p.cat}</small><h3>${p.name}</h3><div class="price">₹${p.price}</div><button class="add" onclick="addCart(${p.id})">Add to Cart</button></div>`).join("")||"<p>No products found.</p>"}
+function addCart(id){let p=data.products.find(x=>x.id===id);let x=cart.find(x=>x.id===id);x?x.qty++:cart.push({...p,qty:1});updateCart()}
+function updateCart(){$('cartCount').textContent=cart.reduce((a,x)=>a+x.qty,0);$('cartTotal').textContent=cart.reduce((a,x)=>a+x.price*x.qty,0)}
+function openCart(){renderCart();$('cartModal').classList.add("show")}
+function closeCart(){$('cartModal').classList.remove("show")}
+function renderCart(){$('cartItems').innerHTML=cart.length?cart.map(x=>`<div style="display:flex;justify-content:space-between;padding:8px 0"><span>${x.emoji} ${x.name} × ${x.qty}</span><b>₹${x.price*x.qty}</b></div>`).join(""):"<p>Your cart is empty.</p>";let t=cart.reduce((a,x)=>a+x.price*x.qty,0)+(cart.length?Number(data.shop.delivery):0);$('checkoutTotal').textContent=t}
+function placeOrder(){if(!cart.length)return $('orderMsg').textContent="Cart empty.";if(!$('cName').value||!$('cMobile').value||!$('cAddress').value)return $('orderMsg').textContent="Please fill name, mobile and address.";let subtotal=cart.reduce((a,x)=>a+x.price*x.qty,0), total=subtotal+Number(data.shop.delivery);data.orders.unshift({id:"KK"+Date.now().toString().slice(-6),customer:$('cName').value,mobile:$('cMobile').value,address:$('cAddress').value,payment:$('cPayment').value,items:cart.map(x=>({name:x.name,qty:x.qty,price:x.price})),total,status:"Pending",date:new Date().toLocaleString("en-IN")});save();cart=[];updateCart();$('orderMsg').innerHTML="✅ Order placed successfully! Order ID: "+data.orders[0].id;renderAdmin()}
+function saveShop(){data.shop={name:$('aName').value||"My Kirana Store",mobile:$('aMobile').value,address:$('aAddress').value,upi:$('aUpi').value,delivery:Number($('aDelivery').value)||0};save();init();alert("Shop details saved!")}
+function addProduct(){let name=$('pName').value.trim(),price=Number($('pPrice').value);if(!name||!price)return alert("Product name and price enter karein.");data.products.push({id:Date.now(),name,cat:pCat.value,price,emoji:$('pEmoji').value||"🛒"});save();$('pName').value="";$('pPrice').value="";$('pEmoji').value="";renderCats();renderProducts();renderAdmin()}
+function deleteProduct(id){data.products=data.products.filter(p=>p.id!==id);save();renderCats();renderProducts();renderAdmin()}
+function renderAdmin(){
+$('manageProducts').innerHTML=data.products.map(p=>`<div style="display:flex;justify-content:space-between;gap:8px;padding:10px 0;border-bottom:1px solid #eee"><span>${p.emoji} <b>${p.name}</b><br><small>${p.cat} • ₹${p.price}</small></span><button class="danger" onclick="deleteProduct(${p.id})">Delete</button></div>`).join("");
+$('orders').innerHTML=data.orders.length?`<table class="table"><tr><th>Order</th><th>Customer</th><th>Items</th><th>Total</th><th>Status</th></tr>`+data.orders.map(o=>`<tr><td><b>${o.id}</b><br><small>${o.date}</small></td><td>${o.customer}<br>${o.mobile}<br><small>${o.address}</small></td><td>${o.items.map(i=>i.name+" × "+i.qty).join(", ")}</td><td>₹${o.total}<br><small>${o.payment}</small></td><td><select onchange="statusOrder('${o.id}',this.value)"><option ${o.status==="Pending"?"selected":""}>Pending</option><option ${o.status==="Accepted"?"selected":""}>Accepted</option><option ${o.status==="Out for Delivery"?"selected":""}>Out for Delivery</option><option ${o.status==="Delivered"?"selected":""}>Delivered</option></select></td></tr>`).join("")+"</table>`:"<p>No orders yet.</p>"
+}
+function statusOrder(id,status){let o=data.orders.find(x=>x.id===id);if(o)o.status=status;save();renderAdmin()}
+window.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
